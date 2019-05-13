@@ -5,6 +5,7 @@ import java8.data.Data;
 import java8.data.Person;
 import org.junit.Test;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -22,7 +23,10 @@ public class Lambda_02_Test {
     // tag::map[]
     private List<Account> map(List<Person> personList, PersonToAccountMapper mapper) {
         // TODO implémenter la méthode pour transformer une liste de personnes en liste de comptes
-        return null;
+    	List<Account> list = new LinkedList<Account>();
+    	for(Person p : personList)
+    		list.add(mapper.map(p));
+        return list;
     }
     // end::map[]
 
@@ -35,7 +39,7 @@ public class Lambda_02_Test {
 
         // TODO transformer la liste de personnes en liste de comptes
         // TODO tous les objets comptes ont un solde à 100 par défaut
-        List<Account> result = map(personList, null);
+        List<Account> result = map(personList, p -> {Account a = new Account(); a.setOwner(p); a.setBalance(100); return a;});
 
         assert result.size() == personList.size();
         for (Account account : result) {
@@ -45,6 +49,17 @@ public class Lambda_02_Test {
     }
     // end::test_map_person_to_account[]
 
+    interface IToJ<I, J>{
+    	J map(I i);
+    }
+    
+    private <I, J> List<J> mapIToJ(List<I> listI, IToJ<I, J> iToJ) {
+    	List<J> list = new LinkedList<J>();
+    	for(I i : listI)
+    		list.add(iToJ.map(i));
+        return list;
+    }
+    
     // tag::test_map_person_to_firstname[]
     @Test
     public void test_map_person_to_firstname() throws Exception {
@@ -52,7 +67,7 @@ public class Lambda_02_Test {
         List<Person> personList = Data.buildPersonList(100);
 
         // TODO transformer la liste de personnes en liste de prénoms
-        List<String> result = null;
+        List<String> result = mapIToJ(personList, p -> p.getFirstname());
 
         assert result.size() == personList.size();
         for (String firstname : result) {
